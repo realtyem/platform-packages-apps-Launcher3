@@ -1664,7 +1664,9 @@ public class LauncherModel extends BroadcastReceiver
 
                 // Restore the default thread priority after we are done loading items
                 synchronized (mLock) {
-                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);
+
+                    try {android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT); }
+                    catch(Exception e) { Log.w(TAG, "setThreadPriority failed"); }
                 }
             }
 
