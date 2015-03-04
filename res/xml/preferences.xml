@@ -27,7 +27,7 @@
         <SwitchPreference
             android:key="pref_key_showSearchBar"
             android:title="@string/pref_title_show_search_bar"
-            android:defaultValue="false" />
+            android:defaultValue="true" />
 
     </PreferenceCategory>
 
