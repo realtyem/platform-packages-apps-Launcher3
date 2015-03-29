@@ -84,7 +84,7 @@ public class DynamicGrid {
                 575, 904,  5, 6,  72, 14.4f,  7, 60, R.xml.default_workspace_5x6));
         // Larger tablet profiles always have system bars on the top & bottom
         deviceProfiles.add(new DeviceProfile("Nexus 10",
-                727, 1207,  5, 6,  76, 14.4f,  7, 64, R.xml.default_workspace_5x6));
+                727, 1207,  5, 8,  76, 14.4f,  11, 64, R.xml.default_workspace_5x6));
         deviceProfiles.add(new DeviceProfile("20-inch Tablet",
                 1527, 2527,  7, 7,  100, 20,  7, 72, R.xml.default_workspace_4x4));
         mMinWidth = dpiFromPx(minWidthPx, dm);
