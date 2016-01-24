@@ -134,6 +134,8 @@ public class Launcher extends Activity
     static final String TAG = "Launcher";
     static final boolean LOGD = false;
 
+    private boolean mWallpaperVisible;
+
     static final boolean PROFILE_STARTUP = false;
     static final boolean DEBUG_WIDGETS = true;
     static final boolean DEBUG_STRICT_MODE = false;
@@ -1043,6 +1045,9 @@ public class Launcher extends Activity
         // orientation.
         getWorkspace().reinflateWidgetsIfNecessary();
         reinflateQSBIfNecessary();
+        
+        getWorkspace().checkWallpaper();
+
 
         if (DEBUG_RESUME_TIME) {
             Log.d(TAG, "Time spent in onResume: " + (System.currentTimeMillis() - startTime));
@@ -1628,6 +1633,8 @@ public class Launcher extends Activity
                 mModel.startLoader(PagedView.INVALID_RESTORE_PAGE,
                         LauncherModel.LOADER_FLAG_CLEAR_WORKSPACE
                                 | LauncherModel.LOADER_FLAG_MIGRATE_SHORTCUTS);
+            } else if (Intent.ACTION_SET_WALLPAPER.equals(action)) {
+                 mWorkspace.checkWallpaper();
             }
         }
     };
@@ -1640,6 +1647,7 @@ public class Launcher extends Activity
         final IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_USER_PRESENT);
+        filter.addAction(Intent.ACTION_SET_WALLPAPER);
         // For handling managed profiles
         if (ENABLE_DEBUG_INTENTS) {
             filter.addAction(DebugIntents.DELETE_DATABASE);
@@ -3234,13 +3242,15 @@ public class Launcher extends Activity
     }
 
     protected void changeWallpaperVisiblity(boolean visible) {
-        int wpflags = visible ? WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER : 0;
+        int wpflags = visible  && mWallpaperVisible ? WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER : 0;
         int curflags = getWindow().getAttributes().flags
                 & WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER;
         if (wpflags != curflags) {
             getWindow().setFlags(wpflags, WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
         }
-        setWorkspaceBackground(visible ? WORKSPACE_BACKGROUND_GRADIENT : WORKSPACE_BACKGROUND_BLACK);
+        
+        if(visible) 
+		    setWorkspaceBackground(visible ? WORKSPACE_BACKGROUND_GRADIENT : WORKSPACE_BACKGROUND_BLACK);
     }
 
     @Override
@@ -4719,6 +4729,13 @@ public class Launcher extends Activity
             }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void) null);
         }
     }
+    
+     void setWallpaperVisibility(boolean visible) {
+         mWallpaperVisible = visible;
+         changeWallpaperVisiblity(visible);
+     }
+     
+     
 }
 
 interface DebugIntents {

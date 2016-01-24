@@ -79,6 +79,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+
+
 /**
  * The workspace is a wide area with a wallpaper and a finite number of pages.
  * Each page contains a number of icons, folders or widgets the user can
@@ -90,6 +94,16 @@ public class Workspace extends PagedView
         Insettable, UninstallSource, AccessibilityDragSource, Stats.LaunchSourceProvider {
     private static final String TAG = "Launcher.Workspace";
 
+
+    private boolean mWallpaperInternal;
+    private Bitmap mWallpaperBitmap;
+    private Paint mPaint = new Paint();
+    private float mWallpaperScrollX;
+    private float mWallpaperScrollY;
+    private int[] mWallpaperOffsets = new int[2];
+    private static final int WALLPAPER_SCROLL_DIM = 200;
+ 
+ 
     private static boolean ENFORCE_DRAG_EVENT_ORDER = false;
 
     protected static final int SNAP_OFF_EMPTY_SCREEN_DURATION = 400;
@@ -320,6 +334,8 @@ public class Workspace extends PagedView
         mFadeInAdjacentScreens = false;
         mWallpaperManager = WallpaperManager.getInstance(context);
 
+        mWallpaperInternal = isWallpaperInternal();
+ 
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.Workspace, defStyle, 0);
         mSpringLoadedShrinkFactor =
@@ -338,6 +354,10 @@ public class Workspace extends PagedView
         setMotionEventSplittingEnabled(true);
     }
 
+	private boolean isWallpaperInternal() {
+		return getResources().getBoolean(R.bool.wallpaper_internal);
+	}
+	
     @Override
     public void setInsets(Rect insets) {
         mInsets.set(insets);
@@ -472,6 +492,29 @@ public class Workspace extends PagedView
     void disableLayoutTransitions() {
         setLayoutTransition(null);
     }
+
+    protected void checkWallpaper() {
+        if (mWallpaperInternal) {
+            if (mWallpaperBitmap != null) {
+                mWallpaperBitmap = null;
+            }
+            if (mWallpaperManager.getWallpaperInfo() == null) {
+                Drawable wallpaper = mWallpaperManager.getDrawable();
+                if (wallpaper instanceof BitmapDrawable) {
+                    mWallpaperBitmap = ((BitmapDrawable) wallpaper).getBitmap();
+                }
+            }
+        }
+        mLauncher.setWallpaperVisibility(mWallpaperBitmap == null);
+
+        // Make sure wallpaper gets redrawn to avoid ghost wallpapers
+        invalidate();
+    }
+
+    public boolean isRenderingWallpaper() {
+        return mWallpaperInternal && mWallpaperBitmap != null;
+    }
+    
 
     @Override
     public void onChildViewAdded(View parent, View child) {
@@ -1376,7 +1419,15 @@ public class Workspace extends PagedView
         private void updateOffset(boolean force) {
             if (mWaitingForUpdate || force) {
                 mWaitingForUpdate = false;
-                if (computeScrollOffset() && mWindowToken != null) {
+                
+                boolean changeOffset = computeScrollOffset();                              
+                if(!changeOffset) return;
+                
+            	if(mWallpaperInternal) {
+            		mWallpaperScrollX = mWallpaperOffset.getCurrX();
+                    mWallpaperScrollY = 0.5f;
+            	}                
+                else if (changeOffset && mWindowToken != null) {
                     try {
                         mWallpaperManager.setWallpaperOffsets(mWindowToken,
                                 mWallpaperOffset.getCurrX(), 0.5f);
@@ -1708,9 +1759,13 @@ public class Workspace extends PagedView
             setWallpaperDimension();
         }
         mWallpaperIsLiveWallpaper = mWallpaperManager.getWallpaperInfo() != null;
+        
         // Force the wallpaper offset steps to be set again, because another app might have changed
         // them
         mLastSetWallpaperOffsetSteps = 0f;
+        
+        mWallpaperInternal = isWallpaperInternal();
+
     }
 
     @Override
@@ -1719,16 +1774,53 @@ public class Workspace extends PagedView
             mWallpaperOffset.syncWithScroll();
             mWallpaperOffset.jumpToFinal();
         }
+        
+        checkWallpaper();
+
         super.onLayout(changed, left, top, right, bottom);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        drawWallpaperIfNeeded(canvas);		
         super.onDraw(canvas);
 
         // Call back to LauncherModel to finish binding after the first draw
         post(mBindPages);
     }
+
+
+    private void drawWallpaperIfNeeded(Canvas canvas) {
+       // Draw the wallpaper if necessary
+        if (isRenderingWallpaper()) {
+            float x = getScrollX();
+            float y = getScrollY();
+
+            int width = getWidth();
+            int height = getHeight();
+            int wallpaperWidth = mWallpaperBitmap.getWidth();
+            int wallpaperHeight = mWallpaperBitmap.getHeight();
+
+            
+            //Log.d("TTTim1", " x="+x + " width="+width + " height="+height + " wallpaperWidth="+wallpaperWidth + " mWallpaperOffsets[0]=" +mWallpaperOffsets[0]);
+            //Log.d("TTTim1b", " mWallpaperOffset.getCurrX()=" + mWallpaperOffset.getCurrX() + " mWallpaperScrollX=" + mWallpaperScrollX);
+            x += (width - wallpaperWidth) / 2;
+            x -= mWallpaperScrollX * WALLPAPER_SCROLL_DIM;
+            
+            if (height + mWallpaperOffsets[1] > wallpaperHeight) {
+                // Wallpaper is smaller than screen
+                y += (height - wallpaperHeight) / 2;
+            } else {
+                y -= mWallpaperScrollY * (wallpaperHeight - (height + mWallpaperOffsets[1])) + mWallpaperOffsets[1];
+            }
+            
+            //Log.d("TTTim2", " x="+x + " width="+width + " height="+height + " wallpaperWidth="+wallpaperWidth);
+
+            canvas.drawBitmap(mWallpaperBitmap, x, y, mPaint);
+        }
+		
+    }
+
 
     @Override
     protected boolean onRequestFocusInDescendants(int direction, Rect previouslyFocusedRect) {
