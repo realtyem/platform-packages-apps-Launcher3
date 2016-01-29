@@ -81,6 +81,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.provider.Settings;
+
+
 
 
 /**
@@ -355,7 +358,10 @@ public class Workspace extends PagedView
     }
 
 	private boolean isWallpaperInternal() {
-		return getResources().getBoolean(R.bool.wallpaper_internal);
+            int currentSystemMode = Settings.System.getInt(mLauncher.getContentResolver(), "kk_ui_wallpaper_mode", 1);
+	    boolean launcherModeInternal = getResources().getBoolean(R.bool.wallpaper_internal);
+
+	    return launcherModeInternal && currentSystemMode != 2 /* KKC.S.WALLPAPER_MODE_DISABLE_SYSTEM */ ;
 	}
 	
     @Override
@@ -1753,6 +1759,8 @@ public class Workspace extends PagedView
             }
         }
 
+        mWallpaperInternal = isWallpaperInternal();
+
         // Update wallpaper dimensions if they were changed since last onResume
         // (we also always set the wallpaper dimensions in the constructor)
         if (LauncherAppState.getInstance().hasWallpaperChangedSinceLastCheck()) {
@@ -1764,7 +1772,6 @@ public class Workspace extends PagedView
         // them
         mLastSetWallpaperOffsetSteps = 0f;
         
-        mWallpaperInternal = isWallpaperInternal();
 
     }
 
