@@ -24,6 +24,7 @@ import android.animation.PropertyValuesHolder;
 import android.animation.TimeInterpolator;
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -282,6 +283,14 @@ public class LauncherStateTransitionAnimation {
 
             // Setup the animation for the content view
             contentView.setVisibility(View.VISIBLE);
+            /*
+             * Because the contentView and revealView overlap, if their backgrounds have alpha,
+             * it will blend and cause a flicker. So get the current alpha of the contentView (for
+             * later) and set to 0. When the animation is done, reset the alpha.
+             */
+            final Drawable contentBackground = contentView.getBackground();
+            final int alpha = contentBackground.getAlpha();
+            contentBackground.setAlpha(0);
             contentView.setAlpha(0f);
             contentView.setTranslationY(revealViewToYDrift);
             layerViews.put(contentView, BUILD_AND_SET_LAYER);
@@ -322,6 +331,7 @@ public class LauncherStateTransitionAnimation {
 
                     // Hide the reveal view
                     revealView.setVisibility(View.INVISIBLE);
+                    contentBackground.setAlpha(alpha);
 
                     // Disable all necessary layers
                     for (View v : layerViews.keySet()) {
@@ -515,6 +525,9 @@ public class LauncherStateTransitionAnimation {
                 animation.play(workspaceAnim);
             }
 
+            final Drawable contentBackground = contentView.getBackground();
+            final int alpha = contentBackground.getAlpha();
+
             // hideAppsCustomizeHelper is called in some cases when it is already hidden
             // don't perform all these no-op animations. In particularly, this was causing
             // the all-apps button to pop in and out.
@@ -522,6 +535,7 @@ public class LauncherStateTransitionAnimation {
                 int width = revealView.getMeasuredWidth();
                 int height = revealView.getMeasuredHeight();
                 float revealRadius = (float) Math.hypot(width / 2, height / 2);
+                contentBackground.setAlpha(0);
                 revealView.setVisibility(View.VISIBLE);
                 revealView.setAlpha(1f);
                 revealView.setTranslationY(0);
@@ -644,6 +658,7 @@ public class LauncherStateTransitionAnimation {
                         contentView.setTranslationX(0);
                         contentView.setTranslationY(0);
                         contentView.setAlpha(1);
+                        contentBackground.setAlpha(alpha);
                     }
                     if (overlaySearchBarView != null) {
                         overlaySearchBarView.setAlpha(1f);
