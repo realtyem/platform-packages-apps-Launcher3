@@ -194,7 +194,9 @@ public class InvariantDeviceProfile {
                 575, 904,     5, 6, 4, 5, 4, 72, 14.4f,  7, 60, R.xml.default_workspace_5x6));
         // Larger tablet profiles always have system bars on the top & bottom
         predefinedDeviceProfiles.add(new InvariantDeviceProfile("Nexus 10",
-                727, 1207,    5, 6, 4, 5, 4, 76, 14.4f,  7, 76, R.xml.default_workspace_5x6));
+//                727, 1207,    5, 6, 4, 5, 4, 76, 14.4f,  7, 76, R.xml.default_workspace_5x6));
+                727, 1207,    5, 10, 4, 5, 4, 76, 14.4f,  11, 72, R.xml.default_workspace_5x6));
+
         predefinedDeviceProfiles.add(new InvariantDeviceProfile("20-inch Tablet",
                 1527, 2527,   7, 7, 6, 6, 4, 100, 20,  7, 72, R.xml.default_workspace_5x6));
         return predefinedDeviceProfiles;
