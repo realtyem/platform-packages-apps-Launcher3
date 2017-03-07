@@ -585,7 +585,7 @@ public class Workspace extends PagedView
      * @param qsb an exisitng qsb to recycle or null.
      */
     public void bindAndInitFirstWorkspaceScreen(View qsb) {
-        if (!FeatureFlags.QSB_ON_FIRST_SCREEN) {
+        if (!FeatureFlags.QSB_ON_FIRST_SCREEN ) {
             return;
         }
         // Add the first page
@@ -617,6 +617,9 @@ public class Workspace extends PagedView
                 }
             });
         }
+
+        if (!Utilities.isQSBEnabled(getContext()) ) return;
+
         // Always add a QSB on the first screen.
         if (qsb == null) {
             // In transposed layout, we add the QSB in the Grid. As workspace does not touch the

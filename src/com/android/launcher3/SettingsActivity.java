@@ -17,6 +17,8 @@
 package com.android.launcher3;
 
 import android.app.Activity;
+import android.content.Context;
+
 import android.content.ContentResolver;
 import android.database.ContentObserver;
 import android.os.Bundle;
@@ -25,6 +27,8 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.provider.Settings;
 import android.provider.Settings.System;
+import android.view.View;
+
 
 /**
  * Settings activity for Launcher. Currently implements the following setting: Allow rotation
@@ -72,6 +76,9 @@ public class SettingsActivity extends Activity {
                 mRotationLockObserver.onChange(true);
                 rotationPref.setDefaultValue(Utilities.getAllowRotationDefaultValue(getActivity()));
             }
+
+            Preference qsbPref = findPreference(Utilities.QSB_PREFERENCE_KEY);
+            qsbPref.setDefaultValue(Utilities.isQSBEnabled(getActivity()));
         }
 
         @Override

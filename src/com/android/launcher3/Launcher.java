@@ -137,6 +137,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+
 /**
  * Default launcher application.
  */
@@ -364,7 +365,7 @@ public class Launcher extends Activity
         }
     }
 
-    private RotationPrefChangeHandler mRotationPrefChangeHandler;
+    private PrefChangeHandler mPrefChangeHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -457,13 +458,9 @@ public class Launcher extends Activity
         registerReceiver(mUiBroadcastReceiver, filter);
 
         mRotationEnabled = getResources().getBoolean(R.bool.allow_rotation);
-        // In case we are on a device with locked rotation, we should look at preferences to check
-        // if the user has specifically allowed rotation.
-        if (!mRotationEnabled) {
-            mRotationEnabled = Utilities.isAllowRotationPrefEnabled(getApplicationContext());
-            mRotationPrefChangeHandler = new RotationPrefChangeHandler();
-            mSharedPrefs.registerOnSharedPreferenceChangeListener(mRotationPrefChangeHandler);
-        }
+        mRotationEnabled = Utilities.isAllowRotationPrefEnabled(getApplicationContext());
+        mPrefChangeHandler = new PrefChangeHandler();
+        mSharedPrefs.registerOnSharedPreferenceChangeListener(mPrefChangeHandler);
 
         // On large interfaces, or on devices that a user has specifically enabled screen rotation,
         // we want the screen to auto-rotate based on the current orientation
@@ -1153,7 +1150,7 @@ public class Launcher extends Activity
         } else {
             // On devices with a locked orientation, we will at least have the allow rotation
             // setting.
-            return !getResources().getBoolean(R.bool.allow_rotation);
+            return !getResources().getBoolean(R.bool.allow_rotation) || getResources().getBoolean(R.bool.has_settings);
         }
     }
 
@@ -1953,8 +1950,8 @@ public class Launcher extends Activity
             LauncherAppState.getInstance().setLauncher(null);
         }
 
-        if (mRotationPrefChangeHandler != null) {
-            mSharedPrefs.unregisterOnSharedPreferenceChangeListener(mRotationPrefChangeHandler);
+        if (mPrefChangeHandler != null) {
+            mSharedPrefs.unregisterOnSharedPreferenceChangeListener(mPrefChangeHandler);
         }
 
         try {
@@ -4481,7 +4478,7 @@ public class Launcher extends Activity
         return ((Launcher) ((ContextWrapper) context).getBaseContext());
     }
 
-    private class RotationPrefChangeHandler implements OnSharedPreferenceChangeListener, Runnable {
+    private class PrefChangeHandler implements OnSharedPreferenceChangeListener, Runnable {
 
         @Override
         public void onSharedPreferenceChanged(
@@ -4491,6 +4488,9 @@ public class Launcher extends Activity
                 if (!waitUntilResume(this, true)) {
                     run();
                 }
+            }
+            else if (Utilities.QSB_PREFERENCE_KEY.equals(key)) {
+                finish();
             }
         }
 
