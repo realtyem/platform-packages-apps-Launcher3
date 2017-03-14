@@ -19,5 +19,9 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="show_qsb_title">Show Quick Search Bar</string>
+    <string name="all_apps_icon_title">Show all apps icon</string>
+    <string name="all_apps_pullup_title">Enable all apps pull up</string>
+    <string name="pulldown_search_title">Enable search on pull down</string>
+    <string name="pref_transparent_dock_title">Enable transparent dock background</string>
 
 </resources>

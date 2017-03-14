@@ -56,6 +56,7 @@ public class Hotseat extends FrameLayout
     @ViewDebug.ExportedProperty(category = "launcher")
     private ColorDrawable mBackground;
     private ValueAnimator mBackgroundColorAnimator;
+    private boolean mBackgroundTransparent = false;
 
     public Hotseat(Context context) {
         this(context, null);
@@ -69,10 +70,13 @@ public class Hotseat extends FrameLayout
         super(context, attrs, defStyle);
         mLauncher = Launcher.getLauncher(context);
         mHasVerticalHotseat = mLauncher.getDeviceProfile().isVerticalBarLayout();
-        mBackgroundColor = ColorUtils.setAlphaComponent(
+        mBackgroundTransparent = Utilities.isEnabled(context, Utilities.TRANSPARENT_DOCK, false);
+        if(!mBackgroundTransparent) {
+            mBackgroundColor = ColorUtils.setAlphaComponent(
                 ContextCompat.getColor(context, R.color.all_apps_container_color), 0);
-        mBackground = new ColorDrawable(mBackgroundColor);
-        setBackground(mBackground);
+            mBackground = new ColorDrawable(mBackgroundColor);
+            setBackground(mBackground);
+        }
     }
 
     public CellLayout getLayout() {
@@ -179,6 +183,7 @@ public class Hotseat extends FrameLayout
     }
 
     public void updateColor(ExtractedColors extractedColors, boolean animate) {
+        if(mBackgroundTransparent) return;
         if (!mHasVerticalHotseat) {
             int color = extractedColors.getColor(ExtractedColors.HOTSEAT_INDEX, Color.TRANSPARENT);
             if (mBackgroundColorAnimator != null) {
@@ -208,6 +213,7 @@ public class Hotseat extends FrameLayout
     }
 
     public void setBackgroundTransparent(boolean enable) {
+        if(mBackground == null) return;
         if (enable) {
             mBackground.setAlpha(0);
         } else {

@@ -402,6 +402,11 @@ public class Launcher extends Activity
                 : app.getInvariantDeviceProfile().portraitProfile;
 
         mSharedPrefs = Utilities.getPrefs(this);
+
+        FeatureFlags.LAUNCHER3_ALL_APPS_PULL_UP = Utilities.isEnabled(getApplicationContext(), Utilities.ALL_APPS_PULLUP, true);
+        FeatureFlags.NO_ALL_APPS_ICON = !Utilities.isEnabled(getApplicationContext(), Utilities.ALL_APPS_ICON, false);
+        FeatureFlags.PULLDOWN_SEARCH = Utilities.isEnabled(getApplicationContext(), Utilities.PULLDOWN_SEARCH, false);
+
         mIsSafeModeEnabled = getPackageManager().isSafeMode();
         mModel = app.setLauncher(this);
         mIconCache = app.getIconCache();
@@ -4489,7 +4494,11 @@ public class Launcher extends Activity
                     run();
                 }
             }
-            else if (Utilities.QSB_PREFERENCE_KEY.equals(key)) {
+            else if (Utilities.QSB_PREFERENCE_KEY.equals(key) 
+                     || Utilities.ALL_APPS_PULLUP.equals(key) 
+                     || Utilities.ALL_APPS_ICON.equals(key) 
+                     || Utilities.PULLDOWN_SEARCH.equals(key)
+                     || Utilities.TRANSPARENT_DOCK.equals(key) ) {
                 finish();
             }
         }

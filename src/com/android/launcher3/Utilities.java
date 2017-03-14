@@ -149,6 +149,10 @@ public final class Utilities {
 
     public static final String ALLOW_ROTATION_PREFERENCE_KEY = "pref_allowRotation";
     public static final String QSB_PREFERENCE_KEY = "pref_show_qsb";
+    public static final String ALL_APPS_PULLUP = "pref_all_apps_pullup";
+    public static final String ALL_APPS_ICON = "pref_all_apps_icon";
+    public static final String PULLDOWN_SEARCH = "pref_pulldown_search";
+    public static final String TRANSPARENT_DOCK = "pref_transparent_dock";
 
     public static boolean isPropertyEnabled(String propertyName) {
         return Log.isLoggable(propertyName, Log.VERBOSE);
@@ -159,9 +163,8 @@ public final class Utilities {
                 getAllowRotationDefaultValue(context));
     }
 
-    public static boolean isQSBEnabled(Context context) {
-        return getPrefs(context).getBoolean(QSB_PREFERENCE_KEY, true);
-    }
+    public static boolean isQSBEnabled(Context context) { return getPrefs(context).getBoolean(QSB_PREFERENCE_KEY, true); }
+    public static boolean isEnabled(Context context, String key, boolean def) { return getPrefs(context).getBoolean(key, def); }
 
     public static boolean getAllowRotationDefaultValue(Context context) {
         if (isNycOrAbove()) {

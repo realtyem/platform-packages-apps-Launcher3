@@ -30,4 +30,28 @@
             android:persistent="true"
     />
 
+    <SwitchPreference
+            android:key="pref_all_apps_icon"
+            android:title="@string/all_apps_icon_title"
+            android:defaultValue="false"
+            android:persistent="true"
+    />
+    <SwitchPreference
+            android:key="pref_all_apps_pullup"
+            android:title="@string/all_apps_pullup_title"
+            android:defaultValue="true"
+            android:persistent="true"
+    />
+    <SwitchPreference
+            android:key="pref_pulldown_search"
+            android:title="@string/pulldown_search_title"
+            android:defaultValue="false"
+            android:persistent="true"
+    />
+    <SwitchPreference
+            android:key="pref_transparent_dock"
+            android:title="@string/pref_transparent_dock_title"
+            android:defaultValue="false"
+            android:persistent="true"
+    />
 </PreferenceScreen>

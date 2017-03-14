@@ -79,6 +79,19 @@ public class SettingsActivity extends Activity {
 
             Preference qsbPref = findPreference(Utilities.QSB_PREFERENCE_KEY);
             qsbPref.setDefaultValue(Utilities.isQSBEnabled(getActivity()));
+
+            String key = Utilities.ALL_APPS_PULLUP;
+            Preference pref = findPreference(key);
+            pref.setDefaultValue(Utilities.isEnabled(getActivity(), key, true));
+            key = Utilities.ALL_APPS_ICON;
+            pref = findPreference(key);
+            pref.setDefaultValue(Utilities.isEnabled(getActivity(), key, false));
+            key = Utilities.PULLDOWN_SEARCH;
+            pref = findPreference(key);
+            pref.setDefaultValue(Utilities.isEnabled(getActivity(), key, false));
+            key = Utilities.TRANSPARENT_DOCK;
+            pref = findPreference(key);
+            pref.setDefaultValue(Utilities.isEnabled(getActivity(), key, false));
         }
 
         @Override
