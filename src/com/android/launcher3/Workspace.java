@@ -618,7 +618,7 @@ public class Workspace extends PagedView
             });
         }
 
-        if (!Utilities.isQSBEnabled(getContext()) ) return;
+        if (!Utilities.isQSBEnabled(getContext()) ) {FeatureFlags.QSB_ON_FIRST_SCREEN = false; return; }
 
         // Always add a QSB on the first screen.
         if (qsb == null) {
